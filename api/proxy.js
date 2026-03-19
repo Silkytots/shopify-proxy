@@ -35,9 +35,13 @@ export default async function handler(req, res) {
 
     // Step 3: Use token to call Shopify API
     const apiRes = await fetch(
-      `https://${shop}/admin/api/2024-01${path}${path.includes("?") ? "&" : "?"}limit=250`,
+      `https://${shop}/admin/api/2024-01${path}`,
       { headers: { "X-Shopify-Access-Token": access_token } }
     );
+
+    // Forward the Link header so the client can paginate
+    const linkHeader = apiRes.headers.get("link");
+    if (linkHeader) res.setHeader("link", linkHeader);
 
     const data = await apiRes.json();
     return res.status(apiRes.status).json(data);
